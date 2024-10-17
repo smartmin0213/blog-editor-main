@@ -7,27 +7,43 @@ export default function BlogPage(props) {
   const [blogIndex, setBlogIndex] = useState(0);
 
   function estimateReadingTime(fullHtml) {
-    // Create a temporary DOM element to parse the full HTML string
     const tempElement = document.createElement('div');
     tempElement.innerHTML = fullHtml;
 
-    // Get the text content of the temporary element
     const textContent = tempElement.innerText || tempElement.textContent;
 
-    // Split the text content into words and filter out empty strings
     const words = textContent.trim().split(/\s+/);
     const wordCount = words.length;
 
-    // Average reading speed in words per minute
-    const averageReadingSpeed = 250; // Adjust this value as needed
+    const averageReadingSpeed = 250;
 
-    // Calculate reading time in minutes
     const readingTimeMinutes = wordCount / averageReadingSpeed;
 
-    // Format the result
-    const readingTime = Math.ceil(readingTimeMinutes); // Round up to the nearest minute
+    const readingTime = Math.ceil(readingTimeMinutes);
 
     return readingTime;
+  }
+
+  const formatDate = date => {
+    return new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(date));
+  }
+
+  function getFirst20WordsFromHtml(htmlContent) {
+    const tempElement = document.createElement('div');
+
+    let from = htmlContent.indexOf('<body');
+    let to = htmlContent.indexOf('/body>') + 6;
+    htmlContent = htmlContent.substring(from, to);
+
+    tempElement.innerHTML = htmlContent;
+
+    const textContent = tempElement.innerText || tempElement.textContent;
+
+    const words = textContent.trim().split(/\s+/);
+
+    const first20Words = words.slice(0, 26).join(' ');
+
+    return first20Words;
   }
 
 
@@ -42,7 +58,7 @@ export default function BlogPage(props) {
       let blog = blogs[0];
       console.log(blog);
 
-      let create = new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(new Date(blog.createdAt));
+      let create = formatDate(blog.createdAt);
       let read = estimateReadingTime(JSON.parse(blog.description).html);
       let title = blog.title;
       props.setBlogInfo({ create, read, title })
@@ -54,7 +70,7 @@ export default function BlogPage(props) {
   return (
     <div className="w-full grid grid-cols-12">
       <div className="col-span-9 flex flex-col items-center bg-black text-white p-4">
-        <div className="max-w-4xl w-full">
+        {/* <div className="max-w-4xl w-full">
           <div className="mb-8">
             <h1 className="text-3xl font-bold mb-4">
               We're thrilled to announce the launch of our most ambitious community initiative yet – the Odyssey.
@@ -149,15 +165,15 @@ export default function BlogPage(props) {
               <li><a href="https://twitter.com/Helena_Hybrid" className="text-blue-400">Twitter: https://twitter.com/Helena_Hybrid</a></li>
             </ul>
           </div>
-        </div>
-        {/* <div className="max-w-4xl w-full">
+        </div> */}
+        <div className="max-w-4xl w-full">
           {blogs[blogIndex] && <iframe
-            style={{width: "100%", height: "500px"}}
+            style={{ width: "100%", height: "500px" }}
             sandbox
             srcdoc={JSON.parse(blogs[blogIndex].description).html}
           >
           </iframe>}
-        </div> */}
+        </div>
       </div>
 
       <div className="col-span-3">
@@ -180,67 +196,38 @@ export default function BlogPage(props) {
           </form>
         </div>
 
-        <div className="w-full max-w-xs">
+        <div className="w-full max-w-xs text-white">
           <h3 className="text-xl font-bold mb-4">You may also like:</h3>
-          <div className="bg-gray-800 p-4 rounded-lg">
-            <img
-              src="path/to/image.jpg"
-              alt="Synesxi's Epic Extravaganza"
-              className="w-full mb-4 rounded"
-            />
-            <p className="text-sm text-gray-400 mb-2">
-              July 18, 2023 • 6 min read
-            </p>
-            <h4 className="text-lg font-bold mb-2">
-              Synesxi's Epic Extravaganza: Your Chance to Win from a $4000 Prize
-              Pool!
-            </h4>
-            <p className="mb-4">
-              We're thrilled to announce the launch of our most ambitious
-              community initiative yet – the Eterna Odyssey. This...
-            </p>
-            <a href="#" className="text-blue-400">
-              Learn more
-            </a>
-          </div>
 
-          <div className="bg-gray-800 p-4 rounded-lg mt-8">
-            <p className="text-sm text-gray-400 mb-2">
-              July 11, 2023 • 4 min read
-            </p>
-            <h4 className="text-lg font-bold mb-2">
-              Using Sentiment Analysis to Predict Cryptocurrency Market Trends
-            </h4>
-            <p className="mb-4">
-              TL;DR: Sentiment analysis is a powerful tool for predicting cryptocurrency market trends by analyzing the collective sentiment expressed...
-            </p>
-            <a href="#" className="text-blue-400">
-              Learn more
-            </a>
-          </div>
+          {blogs.map((blog, index) => {
+            if (index === blogIndex) return;
 
-          <div className="bg-gray-800 p-4 rounded-lg mt-8">
-            <p className="text-sm text-gray-400 mb-2">
-              July 11, 2023 • 4 min read
-            </p>
-            <h4 className="text-lg font-bold mb-2">
-              The Importance of Cross-Chain Trading in Cryptocurrency
-            </h4>
-            <p className="mb-4">
-              TL;DR: Cross-chain trading is a crucial element in the cryptocurrency world, offering enhanced liquidity, diversification of investment opportunities...
-            </p>
-            <a href="#" className="text-blue-400">
-              Learn more
-            </a>
-          </div>
+            return (
+              <div className="bg-gray-800 p-4 rounded-lg mt-8">
+                <p className="text-sm text-gray-400 mb-2">
+                  {formatDate(blog.createdAt)} • {estimateReadingTime(JSON.parse(blog.description).html)} min read
+                </p>
+                <h4 className="text-lg font-bold mb-2">
+                  {blog.title}
+                </h4>
+                <p className="mb-4">
+                  {getFirst20WordsFromHtml(JSON.parse(blog.description).html)}...
+                </p>
+                <a href="#" className="text-blue-400 cursor-pointer" onClick={() => {
+                  let create = formatDate(blog.createdAt);
+                  let read = estimateReadingTime(JSON.parse(blog.description).html);
+                  let title = blog.title;
+                  props.setBlogInfo({ create, read, title })
+                  setBlogIndex(index)
+                }}>
+                  Learn more
+                </a>
+              </div>
+            );
+          })}
+
         </div>
-        {/* {blogs.map((blog, index) => {
-          return (
-            <div key={index} className={index === blogIndex ? "w-full max-w-xs bg-blue-600 p-4 rounded-lg mb-8 text-white cursor-pointer}" : "w-full max-w-xs bg-blue-300 p-4 rounded-lg mb-8 text-white cursor-pointer"} onClick={() => setBlogIndex(index)}>
-              {blog.title}
-            </div>
-          );
-        })} */}
+
       </div>
     </div>
   );
