@@ -27,7 +27,7 @@ export default function BlogLayout({ children }) {
 
   return (
     <div className="w-full flex flex-col justify-center items-center overflow-x-hidden overflow-y-hidden sticky">
-      <div className="pt-[130px] w-full h-[100%] flex flex-col justify-center items-center overflow-x-hidden bg-gradient-to-br from-[#000] via-[#59D8F033] via-[#FF1CF71A] to-blue-900">
+      <div className="pt-[130px] w-full h-[100%] flex flex-col justify-center items-center overflow-x-hidden bg-gradient-to-br from-[#000] via-[#59D8F033] via-[#FF1CF71A] to-blue-900 overflow-hidden">
         <div className="w-4/5 h-[450px] flex">
           <div className="w-1/2 h-[100%] flex flex-col justify-center container mx-auto px-4 py-8">
             <a href="#" className="text-green-500 flex items-center mb-4">

@@ -55,6 +55,8 @@ export default function BlogPage(props) {
       setBlogs(blogs);
       setBlogIndex(0);
 
+      if (blogs.length === 0) return;
+
       let blog = blogs[0];
       console.log(blog);
 
@@ -168,9 +170,14 @@ export default function BlogPage(props) {
         </div> */}
         <div className="max-w-4xl w-full">
           {blogs[blogIndex] && <iframe
-            style={{ width: "100%", height: "500px" }}
+            style={{width: "100%", height: "auto"}}
             sandbox
-            srcdoc={JSON.parse(blogs[blogIndex].description).html}
+            srcdoc={JSON.parse(blogs[blogIndex].description).html.replace('<html', '<html style="overflow: hidden"')}
+            onLoad={(event) => {
+              let iframe = event.target;
+              console.log('iframe onload', iframe)
+              iframe.style.height = iframe.contentWindow.document.body.scrollHeight + 'px';
+            }}
           >
           </iframe>}
         </div>
